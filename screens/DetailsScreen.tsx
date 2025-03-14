@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Button, FlatList } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
-import { DetailsStyle , DataDetails } from '../styles/style';
+import { DetailsStyle, DataDetails } from '../styles/style';
 import useResults1 from '../hooks/useResults1';
 import { DetailsScreenProps } from '../types/type';
 
 const DetailsScreen: React.FC<DetailsScreenProps> = ({ route }) => {
-    const { term } = route.params;
+    const { term } = route.params || 'null';
     const searchTerm = term || 'Madaba';
 
-    const { searchApi1, results1, errorMessage1 } = useResults1();
+    const { searchApi1, results1, cityName, cityId, errorMessage1 } = useResults1();
     const [showChart, setShowChart] = useState(false);
 
     useEffect(() => {
@@ -18,7 +18,7 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ route }) => {
     }, [searchTerm]);
 
     useEffect(() => {
-        console.log('Results1 updated:');
+        console.log('Results1 updated:', results1);
     }, [results1]);
 
     const toggleChart = () => {
@@ -40,10 +40,11 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ route }) => {
 
     return (
         <View style={DetailsStyle.container}>
-
-            <Text style={{ alignSelf: 'center', fontSize: 25 }}>
-                {`forecast ${searchTerm}`}
-            </Text>
+            {cityName && cityId && (
+                <Text style={{ alignSelf: 'center', fontSize: 25 }}>
+                    {`Forecast for ${cityName} (ID: ${cityId})`}
+                </Text>
+            )}
 
             {errorMessage1 ? (
                 <Text style={DataDetails.error}>{errorMessage1}</Text>
@@ -98,7 +99,6 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ route }) => {
                                 <Text>🔼 Temp: {item.temp}°C</Text>
                                 <Text>🔽 Min: {item.temp_min}°C | Max: {item.temp_max}°C</Text>
                             </View>
-
                         )}
                     />
 
@@ -110,7 +110,5 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ route }) => {
         </View>
     );
 };
-
-
 
 export default DetailsScreen;

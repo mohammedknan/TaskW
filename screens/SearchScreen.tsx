@@ -17,7 +17,7 @@ const SearchScreen: React.FC<SearchScreenProps> = ({ navigation, route }) => {
     const [term, setTerm] = useState<string>("");
 
     const { searchApi, results } = useResults();
-    const { searchApi1, results1 } = useResults1();
+    const { searchApi1, results1 , cityId , cityName } = useResults1();
 
     const termFromParams = route.params?.term ?? "";
 
@@ -76,12 +76,10 @@ const SearchScreen: React.FC<SearchScreenProps> = ({ navigation, route }) => {
         return () => debouncedSearch.cancel();
     }, [term]);
 
-
-
-
     return (
         <View style={searchStyle.container}>
             <Search term={term} onTermChange={setTerm} onTermSubmit={() => debouncedSearch(term)} />
+
             <View style={searchStyle.btn}>
                 <Button
                     title="Go to Details"
@@ -90,7 +88,16 @@ const SearchScreen: React.FC<SearchScreenProps> = ({ navigation, route }) => {
                 />
             </View>
 
+
+
             <View>
+
+                {cityName && cityId && (
+                    <Text style={{ alignSelf: 'center', fontSize: 25 }}>
+                        {`Forecast for ${cityName} (ID: ${cityId})`}
+                    </Text>
+                )}
+
                 <Text style={{ fontSize: 25 }}>Current :</Text>
 
                 {results?.temp ? (

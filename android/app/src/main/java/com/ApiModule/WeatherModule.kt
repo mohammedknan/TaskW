@@ -11,6 +11,11 @@ import retrofit2.Callback
 import retrofit2.Response
 
 
+data class City(
+    val id: Int,
+    val name: String
+)
+
 data class MainWeather(
     val temp: Double,
     val temp_min: Double,
@@ -19,7 +24,9 @@ data class MainWeather(
 
 data class WeatherResponse(
     val main: MainWeather,
-    val list: List<WeatherItem>? = null
+    val list: List<WeatherItem>? = null,
+     val city: City? = null
+
 )
 
 data class WeatherItem(
@@ -27,6 +34,7 @@ data class WeatherItem(
     val main: TemperatureInfo
 
 )
+
 
 data class TemperatureInfo(
     val temp: Double,
@@ -94,33 +102,39 @@ class WeatherModule(reactContext: ReactApplicationContext) : ReactContextBaseJav
         })
     }
 
-    @ReactMethod
-    fun fetchWeather12(city: String, promise: Promise) {
-        forecastService.getForecast(city, API_KEY).enqueue(object : Callback<WeatherResponse> {
-            override fun onResponse(call: Call<WeatherResponse>, response: Response<WeatherResponse>) {
-                if (response.isSuccessful) {
-                    val weatherData = response.body()
-                    val weatherArray = Arguments.createArray()
+  @ReactMethod
+  fun fetchWeather12(city: String, promise: Promise) {
+      forecastService.getForecast(city, API_KEY).enqueue(object : Callback<WeatherResponse> {
+          override fun onResponse(call: Call<WeatherResponse>, response: Response<WeatherResponse>) {
+              if (response.isSuccessful) {
+                  val weatherData = response.body()
+                  val weatherArray = Arguments.createArray()
 
-                    weatherData?.list?.forEach { item ->
-                        val weatherMap = Arguments.createMap().apply {
-                            putString("date", item.dt_txt)
-                            putDouble("temp", item.main.temp)
-                            putDouble("temp_min", item.main.temp_min)
-                            putDouble("temp_max", item.main.temp_max)
+                  weatherData?.list?.forEach { item ->
+                      val weatherMap = Arguments.createMap().apply {
+                          putString("date", item.dt_txt)
+                          putDouble("temp", item.main.temp)
+                          putDouble("temp_min", item.main.temp_min)
+                          putDouble("temp_max", item.main.temp_max)
+                      }
+                      weatherArray.pushMap(weatherMap)
+                  }
 
-                        }
-                        weatherArray.pushMap(weatherMap)
-                    }
-                    promise.resolve(weatherArray)
-                } else {
-                    promise.reject("API_ERROR", "Failed to fetch weather forecast data")
-                }
-            }
+                  val result = Arguments.createMap().apply {
+                      putArray("forecast", weatherArray)
+                      weatherData?.city?.let { cityInfo ->
+                          putInt("cityId", cityInfo.id)
+                          putString("cityName", cityInfo.name)
+                      }
+                  }
+                  promise.resolve(result)
+              } else {
+                  promise.reject("API_ERROR", "Failed to fetch weather forecast data")
+              }
+          }
 
-            override fun onFailure(call: Call<WeatherResponse>, t: Throwable) {
-                promise.reject("NETWORK_ERROR", t.message)
-            }
-        })
-    }
-}
+          override fun onFailure(call: Call<WeatherResponse>, t: Throwable) {
+              promise.reject("NETWORK_ERROR", t.message)
+          }
+      })
+  } }
