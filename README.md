@@ -18,7 +18,7 @@ Weather App allows users to easily check the weather for any city.The app displa
 
 Language: (TypeScript)
 
-Framework: ( React Native : (using TypeScript and React Native CLI) )
+Framework: ( React Native : (using TypeScript and React Native CLI))
 
 Weather Data Source: (API used OpenWeatherMap , use Kotlin with Retrofit )
 
