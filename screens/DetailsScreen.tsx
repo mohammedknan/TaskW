@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, useMemo} from 'react';
 import { View, Text, Button, FlatList } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import { DetailsStyle, DataDetails } from '../styles/style';
@@ -17,19 +17,19 @@ const DetailsScreen: React.FC<DetailsScreenProps> = ({ route }) => {
         searchApi1(searchTerm);
     }, [searchTerm]);
 
-    useEffect(() => {
-        console.log('Results1 updated:', results1);
-    }, [results1]);
-
     const toggleChart = () => {
         setShowChart(!showChart);
     };
 
-    const filteredData = results1?.filter((item, index, self) => {
-        const date: string = item.date.split(' ')[0];
-        return self.findIndex((el) => el.date.split(' ')[0] === date) === index;
-    })
-        .slice(1, 6) || [];
+
+    const filteredData = useMemo(() => {
+        return results1?.filter((item, index, self) => {
+            const date: string = item.date.split(' ')[0];
+            return self.findIndex((el) => el.date.split(' ')[0] === date) === index;
+        }).slice(1, 6) || [];
+    }, [results1]);
+
+
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
